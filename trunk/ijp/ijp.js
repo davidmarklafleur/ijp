@@ -23,7 +23,7 @@ var icalParser={
 		matches=icsString.match(reg);
 		if(matches){
 			for(i=0;i<matches.length;i++){
-				console.log('TODO=>'+matches[i]);
+				//console.log('TODO=>'+matches[i]);
 				this.parseVtodo(matches[i]);
 			}
 		}
@@ -31,7 +31,7 @@ var icalParser={
 		matches=icsString.match(reg);
 		if(matches){
 			for(i=0;i<matches.length;i++){
-				console.log('JOURNAL=>'+matches[i]);
+				//console.log('JOURNAL=>'+matches[i]);
 				this.parseVjournal(matches[i]);
 			}
 		}
@@ -39,15 +39,14 @@ var icalParser={
 		matches=icsString.match(reg);
 		if(matches){
 			for(i=0;i<matches.length;i++){
-				console.log('FREEBUSY=>'+matches[i]);
+				//console.log('FREEBUSY=>'+matches[i]);
 				this.parseVfreebusy(matches[i]);
 			}
 		}
-		console.log('parsed');
-		//alert(this.ical.events[0].start.params.valeurs);
+		//console.log('parsed');
 	},
 	parseVfreebusy: function(vfreeString){
-		////PROCHAINE VERSION: Générer seul les propriétés trouvées : + rapide
+		////PROCHAINE VERSION: Gï¿½nï¿½rer seul les propriï¿½tï¿½s trouvï¿½es : + rapide
 		var freebusy={
 			contact:this.getValue('CONTACT',vfreeString), //
 			dtstart:this.getValue('DTSTART',veventString), //This property specifies when the calendar component begins.
@@ -68,9 +67,9 @@ var icalParser={
 		this.ical.freebusys[this.ical.freebusys.length]=freebusy;
 	},
 	parseVjournal: function(vjournalString){
-		////PROCHAINE VERSION: Générer seul les propriétés trouvées : + rapide
+		////PROCHAINE VERSION: Gï¿½nï¿½rer seul les propriï¿½tï¿½s trouvï¿½es : + rapide
 		var journal={
-			class:this.getValue('CLASS',vjournalString), //This property defines the access classification for a calendar component.
+			klass:this.getValue('CLASS',vjournalString), //This property defines the access classification for a calendar component.
 			created:this.getValue('CREATED',vjournalString), //This property specifies the date and time that the calendar information was created by the calendar user agent in the calendar store.
 			description:this.getValue('DESCRIPTION',vjournalString), //This property provides a more complete description of the calendar component, than that provided by the "SUMMARY" property.
 			dtstart:this.getValue('DTSTART',veventString), //This property specifies when the calendar component begins.
@@ -100,9 +99,9 @@ var icalParser={
 		this.ical.journals[this.ical.journals.length]=journal;
 	},
 	parseVtodo: function(vtodoString){
-		////PROCHAINE VERSION: Générer seul les propriétés trouvées : + rapide
+		////PROCHAINE VERSION: Gï¿½nï¿½rer seul les propriï¿½tï¿½s trouvï¿½es : + rapide
 		var todo={
-			class:this.getValue('CLASS',vtodoString), //This property defines the access classification for a calendar component.
+			klass:this.getValue('CLASS',vtodoString), //This property defines the access classification for a calendar component.
 			completed:this.getValue('COMPLETED',vtodoString), //This property defines the date and time that a to-do was actually completed.
 			created:this.getValue('CREATED',vtodoString), //This property specifies the date and time that the calendar information was created by the calendar user agent in the calendar store.
 			description:this.getValue('DESCRIPTION',vtodoString), //This property provides a more complete description of the calendar component, than that provided by the "SUMMARY" property.
@@ -140,9 +139,9 @@ var icalParser={
 		this.ical.todos[this.ical.todos.length]=todo;
 	},
 	parseVevent: function(veventString){
-		////PROCHAINE VERSION: Générer seul les propriétés trouvées : + rapide
+		////PROCHAINE VERSION: Gï¿½nï¿½rer seul les propriï¿½tï¿½s trouvï¿½es : + rapide
 		var event={
-			class:this.getValue('CLASS',veventString), //This property defines the access classification for a calendar component.
+			klass:this.getValue('CLASS',veventString), //This property defines the access classification for a calendar component.
 			created:this.getValue('CREATED',veventString), //This property specifies the date and time that the calendar information was created by the calendar user agent in the calendar store.
 			description:this.getValue('DESCRIPTION',veventString), //This property provides a more complete description of the calendar component, than that provided by the "SUMMARY" property.
 			geo:this.getValue('GEO',veventString), //This property specifies information related to the global position for the activity specified by a calendar component.
@@ -192,18 +191,17 @@ var icalParser={
 		}else{
 			var reg=new RegExp('('+propName+')(;[^=]*=[^;:\n]*)*:([^\n]*)','g');
 			var matches=reg.exec(txt);
-			if(matches){ //on a trouvé la propriété cherchée
+			if(matches){ //on a trouvï¿½ la propriï¿½tï¿½ cherchï¿½e
 				var valeur=RegExp.$3;
-				var tab_params;
-				if(RegExp.$2.length>0){ //il y a des paramètres associés
+				var tab_params={};
+				if(RegExp.$2.length>0){ //il y a des paramï¿½tres associï¿½s
 					var params=RegExp.$2.substr(1).split(';');
-					var pair;var code='';
+					var pair;
 					for(k=0;k<params.length;k++){
 						pair=params[k].split('=');
 						if(!pair[1]) pair[1]=pair[0];
-						code+=pair[0].replace(/-/,'')+' : "'+pair[1]+'", '; 
+						tab_params[pair[0]]=pair[1];
 					}
-					eval('tab_params=( { '+code.substr(0,code.length-2)+' } );');
 				}
 				//console.log(propName+' '+valeur+'\n'+toJsonString(tab_params));
 				return {
@@ -214,5 +212,8 @@ var icalParser={
 				return null;
 			}
 		}
+	},
+	getEvents:function(){
+		return this.ical.events;
 	}
 }
