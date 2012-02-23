@@ -10,6 +10,7 @@ var icalParser={
 	parseIcal: function(icsString){
 		this.ical.version=this.getValue('VERSION',icsString);
 		this.ical.prodid=this.getValue('PRODID',icsString);
+		icsString=icsString.replace(/\r\n /g,'');
 		
 		var reg=/BEGIN:VEVENT(\r?\n[^B].*)+/g;
 		var matches=icsString.match(reg);
@@ -46,11 +47,11 @@ var icalParser={
 		//console.log('parsed');
 	},
 	parseVfreebusy: function(vfreeString){
-		////PROCHAINE VERSION: G�n�rer seul les propri�t�s trouv�es : + rapide
+		////PROCHAINE VERSION: Générer seul les propriétés trouvées : + rapide
 		var freebusy={
 			contact:this.getValue('CONTACT',vfreeString), //
-			dtstart:this.getValue('DTSTART',veventString), //This property specifies when the calendar component begins.
-			dtend:this.getValue('DTEND',veventString), //This property specifies when the calendar component ends.
+			dtstart:this.getValue('DTSTART',vfreeString), //This property specifies when the calendar component begins.
+			dtend:this.getValue('DTEND',vfreeString), //This property specifies when the calendar component ends.
 			duration:this.getValue('DURATION',vfreeString), //
 			description:this.getValue('DESCRIPTION',vfreeString), //This property provides a more complete description of the calendar component, than that provided by the "SUMMARY" property.
 			dtstamp:this.getValue('DTSTAMP',vfreeString), //The property indicates the date/time that the instance of the iCalendar object was created.
@@ -67,7 +68,7 @@ var icalParser={
 		this.ical.freebusys[this.ical.freebusys.length]=freebusy;
 	},
 	parseVjournal: function(vjournalString){
-		////PROCHAINE VERSION: G�n�rer seul les propri�t�s trouv�es : + rapide
+		////PROCHAINE VERSION: Générer seul les propriétés trouvées : + rapide
 		var journal={
 			klass:this.getValue('CLASS',vjournalString), //This property defines the access classification for a calendar component.
 			created:this.getValue('CREATED',vjournalString), //This property specifies the date and time that the calendar information was created by the calendar user agent in the calendar store.
@@ -99,7 +100,7 @@ var icalParser={
 		this.ical.journals[this.ical.journals.length]=journal;
 	},
 	parseVtodo: function(vtodoString){
-		////PROCHAINE VERSION: G�n�rer seul les propri�t�s trouv�es : + rapide
+		////PROCHAINE VERSION: Générer seul les propriétés trouvées : + rapide
 		var todo={
 			klass:this.getValue('CLASS',vtodoString), //This property defines the access classification for a calendar component.
 			completed:this.getValue('COMPLETED',vtodoString), //This property defines the date and time that a to-do was actually completed.
@@ -139,7 +140,7 @@ var icalParser={
 		this.ical.todos[this.ical.todos.length]=todo;
 	},
 	parseVevent: function(veventString){
-		////PROCHAINE VERSION: G�n�rer seul les propri�t�s trouv�es : + rapide
+		////PROCHAINE VERSION: Générer seul les propriétés trouvées : + rapide
 		var event={
 			klass:this.getValue('CLASS',veventString), //This property defines the access classification for a calendar component.
 			created:this.getValue('CREATED',veventString), //This property specifies the date and time that the calendar information was created by the calendar user agent in the calendar store.
@@ -182,28 +183,32 @@ var icalParser={
 			var props=[];
 			if(matches){
 				for(l=0;l<matches.length;l++){
+					matches[l]=matches[l].replace(/:.*/,'');
 					//on enleve les parametres 
-					matches[l]=matches[l].replace(/;.*/,'');
 					props[props.length]=this.getValue(matches[l],txt);
 				}
+				//console.log(props);
 				return props;
 			}
 		}else{
-			var reg=new RegExp('('+propName+')(;[^=]*=[^;:\n]*)*:([^\n]*)','g');
+			propName=propName.replace(/^\s+/g,'').replace(/\s+$/g,'');
+			//console.log('('+propName.replace(/;(.*)/,')(;.*')+')');
+			var reg=new RegExp('('+(propName.indexOf(';')?propName.replace(/;(.*)/,')(;.*'):propName)+')((?:;[^=]*=[^;:\n]*)*):([^\n\r]*)','g');
 			var matches=reg.exec(txt);
-			if(matches){ //on a trouv� la propri�t� cherch�e
+			if(matches){ //on a trouvé la propriété cherchée
+				//console.log('params='+RegExp.$2+' / valeur='+RegExp.$3);
 				var valeur=RegExp.$3;
 				var tab_params={};
-				if(RegExp.$2.length>0){ //il y a des param�tres associ�s
+				if(RegExp.$2.length>0){ //il y a des paramètres associés
 					var params=RegExp.$2.substr(1).split(';');
 					var pair;
 					for(k=0;k<params.length;k++){
 						pair=params[k].split('=');
 						if(!pair[1]) pair[1]=pair[0];
-						tab_params[pair[0]]=pair[1];
+						tab_params[pair[0]] = pair[1];
 					}
 				}
-				//console.log(propName+' '+valeur+'\n'+toJsonString(tab_params));
+				//console.log(tab_params);
 				return {
 					value:valeur,
 					params:tab_params
