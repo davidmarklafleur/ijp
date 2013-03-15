@@ -12,7 +12,7 @@ var icalParser={
 		this.ical.prodid=this.getValue('PRODID',icsString);
 		icsString=icsString.replace(/\r\n /g,'');
 		
-		var reg=/BEGIN:VEVENT(\r?\n[^B].*)+/g;
+		var reg=/BEGIN:VEVENT\s*[\s\S]*?END:VEVENT/g;;
 		var matches=icsString.match(reg);
 		if(matches){
 			for(i=0;i<matches.length;i++){
@@ -20,7 +20,7 @@ var icalParser={
 				this.parseVevent(matches[i]);
 			}
 		}
-		reg=/BEGIN:VTODO(\r?\n[^B].*)+/g;
+		reg=/BEGIN:VTODO\s*[\s\S]*?END:VTODO/g;
 		matches=icsString.match(reg);
 		if(matches){
 			for(i=0;i<matches.length;i++){
@@ -28,7 +28,7 @@ var icalParser={
 				this.parseVtodo(matches[i]);
 			}
 		}
-		reg=/BEGIN:VJOURNAL(\r?\n[^B].*)+/g;
+		reg=/BEGIN:VJOURNAL\s*[\s\S]*?END:VJOURNAL/g;
 		matches=icsString.match(reg);
 		if(matches){
 			for(i=0;i<matches.length;i++){
@@ -36,7 +36,7 @@ var icalParser={
 				this.parseVjournal(matches[i]);
 			}
 		}
-		reg=/BEGIN:VFREEBUSY(\r?\n[^B].*)+/g;
+		reg=/BEGIN:VFREEBUSY\s*[\s\S]*?END:VFREEBUSY/g;
 		matches=icsString.match(reg);
 		if(matches){
 			for(i=0;i<matches.length;i++){
