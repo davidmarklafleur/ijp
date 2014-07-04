@@ -191,9 +191,9 @@ var icalParser={
 				return props;
 			}
 		}else{
-			propName=propName.replace(/^\s+/g,'').replace(/\s+$/g,'');
+			propName=propName.replace(/^\s+/g,'').replace(/\s+$/gi,'');
 			//console.log('('+propName.replace(/;(.*)/,')(;.*')+')');
-			var reg=new RegExp('('+(propName.indexOf(';')?propName.replace(/;(.*)/,')(;.*'):propName)+')((?:;[^=]*=[^;:\n]*)*):([^\n\r]*)','g');
+			var reg=new RegExp('('+(propName.indexOf(';')?propName.replace(/;(.*)/,')(;.*'):propName)+')((?:;[^=]*=[^;:\n]*)*):([^\n\r]*)','gi');
 			var matches=reg.exec(txt);
 			if(matches){ //on a trouvé la propriété cherchée
 				//console.log('params='+RegExp.$2+' / valeur='+RegExp.$3);
