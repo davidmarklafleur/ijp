@@ -12,7 +12,7 @@ var icalParser={
 		this.ical.prodid=this.getValue('PRODID',icsString);
 		icsString=icsString.replace(/\r\n /g,'');
 		
-		var reg=/BEGIN:VEVENT\s*[\s\S]*?END:VEVENT/g;;
+		var reg=/BEGIN:VEVENT(\r?\n[^B].*)+/g;
 		var matches=icsString.match(reg);
 		if(matches){
 			for(i=0;i<matches.length;i++){
@@ -20,7 +20,7 @@ var icalParser={
 				this.parseVevent(matches[i]);
 			}
 		}
-		reg=/BEGIN:VTODO\s*[\s\S]*?END:VTODO/g;
+		reg=/BEGIN:VTODO(\r?\n[^B].*)+/g;
 		matches=icsString.match(reg);
 		if(matches){
 			for(i=0;i<matches.length;i++){
@@ -28,7 +28,7 @@ var icalParser={
 				this.parseVtodo(matches[i]);
 			}
 		}
-		reg=/BEGIN:VJOURNAL\s*[\s\S]*?END:VJOURNAL/g;
+		reg=/BEGIN:VJOURNAL(\r?\n[^B].*)+/g;
 		matches=icsString.match(reg);
 		if(matches){
 			for(i=0;i<matches.length;i++){
@@ -36,7 +36,7 @@ var icalParser={
 				this.parseVjournal(matches[i]);
 			}
 		}
-		reg=/BEGIN:VFREEBUSY\s*[\s\S]*?END:VFREEBUSY/g;
+		reg=/BEGIN:VFREEBUSY(\r?\n[^B].*)+/g;
 		matches=icsString.match(reg);
 		if(matches){
 			for(i=0;i<matches.length;i++){
@@ -63,7 +63,7 @@ var icalParser={
 			comment:this.getValue('COMMENT',vfreeString,true), //This property specifies non-processing information intended to provide a comment to the calendar user.			
 			freebusy:this.getValue('FREEBUSY',vfreeString,true), //The property defines one or more free or busy time intervals.
 			rstatus:this.getValue('REQUEST-STATUS',vfreeString,true), //This property defines the status code returned for a scheduling request.			
-			xprop:this.getValue('X-',vfreeString,true), //
+			xprop:this.getValue('X-',vfreeString,true)
 		};
 		this.ical.freebusys[this.ical.freebusys.length]=freebusy;
 	},
@@ -95,7 +95,7 @@ var icalParser={
 			rdate:this.getValue('RDATE',vjournalString,true), //This property defines the list of date/times for a recurrence set.
 			rrule:this.getValue('RRULE',vjournalString,true), //This property defines a rule or repeating pattern for recurring events, to-dos, or time zone definitions.
 			rstatus:this.getValue('REQUEST-STATUS',vjournalString,true), //This property defines the status code returned for a scheduling request.			
-			xprop:this.getValue('X-',vjournalString,true), //
+			xprop:this.getValue('X-',vjournalString,true)
 		};
 		this.ical.journals[this.ical.journals.length]=journal;
 	},
@@ -135,7 +135,7 @@ var icalParser={
 			resources:this.getValue('RESOURCES',vtodoString,true), //This property defines the equipment or resources anticipated for an activity specified by a calendar entity..
 			rdate:this.getValue('RDATE',vtodoString,true), //This property defines the list of date/times for a recurrence set.
 			rrule:this.getValue('RRULE',vtodoString,true), //This property defines a rule or repeating pattern for recurring events, to-dos, or time zone definitions.
-			xprop:this.getValue('X-',vtodoString,true), //
+			xprop:this.getValue('X-',vtodoString,true) //
 		};
 		this.ical.todos[this.ical.todos.length]=todo;
 	},
