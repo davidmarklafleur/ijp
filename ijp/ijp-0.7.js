@@ -81,7 +81,4 @@ var icalParser = {
 		}
 		return prop;
 	},
-	getEvents:function(){
-		return this.ical.events;
-	}
 }
