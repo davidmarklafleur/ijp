@@ -6,8 +6,8 @@ var Ical = function Ical(){
 	this.journals = [];
 	this.freebusys = [];
 }
-var xprops='x-[^:;]+';
-var ianaprops='[\\w]+[^:;]+'
+var xprops = 'x-[^:;]+';
+var ianaprops = '[\\w]+[^:;]+'
 var icalParser = {
 	icals : [],
 	propsList : {
@@ -20,69 +20,64 @@ var icalParser = {
 		var cals = icsString.match(/BEGIN:VCALENDAR\r?\n(.*\r?\n)+?END:VCALENDAR/ig);
 		for(var index in cals){
 			//console.log("--->"+index+" "+cals[index]);
-			var ical=new Ical(); 
-			ical.version=this.getValue('VERSION',cals[index]);
-			ical.prodid=this.getValue('PRODID',cals[index]);
-			cals[index]=cals[index].replace(/\r\n /g,'');
-			
-			cals[index]=cals[index].replace(/BEGIN:VCALENDAR\r?\n/ig,'');
-			var reg=/BEGIN:(V.*?)\r?\n(.*\r?\n)+?END:\1/gi;
-			matches=cals[index].match(reg);
+			var ical = new Ical(); 
+			ical.version = this.getValue('VERSION',cals[index]);
+			ical.prodid = this.getValue('PRODID',cals[index]);
+			cals[index] = cals[index].replace(/\r\n /g,'');
+			cals[index] = cals[index].replace(/BEGIN:VCALENDAR\r?\n/ig,'');
+			var reg = /BEGIN:(V.*?)\r?\n(.*\r?\n)+?END:\1/gi;
+			matches = cals[index].match(reg);
 			if(matches){
 				for(i=0;i<matches.length;i++){
 					//console.log('---------->'+matches[i]+"\n<------------");
 					this.parseVComponent(matches[i],ical);
 				}
 			}
-			this.icals[this.icals.length]=ical;
+			this.icals[this.icals.length] = ical;
 		}
 	},
 	parseVComponent : function(vComponent,ical){
-		var nameComponent=vComponent.match(/BEGIN:V([^\s]+)/i)[1].toLowerCase();
-		vComponent=vComponent.replace(/\r?\n[\s]+/igm,''); //unfolding
-		vComponent=vComponent.replace(/(^begin|^end):.*/igm,'');
+		var nameComponent = vComponent.match(/BEGIN:V([^\s]+)/i)[1].toLowerCase();
+		vComponent = vComponent.replace(/\r?\n[\s]+/igm,''); //unfolding
+		vComponent = vComponent.replace(/(^begin|^end):.*/igm,'');
 		//console.log(nameComponent+' ++++ '+vComponent);
-		var props=vComponent.match(new RegExp(this.propsList[nameComponent]+'[:;].*','gim'));
+		var props = vComponent.match(new RegExp(this.propsList[nameComponent]+'[:;].*','gim'));
 		if(props){
 			var component=[];
 			for(var index in props){
-				var nom=props[index].replace(/[:;].*$/,'');
+				var nom = props[index].replace(/[:;].*$/,'');
 				//console.log("--vcompo "+index+" "+nom);
-				var propKey=/*'prop_'+*/nom.toLowerCase();
-				if(component[propKey]===undefined) component[propKey]=[];
-				component[propKey][component[propKey].length]=this.getValue(nom,props[index]);
-				component['raw']=vComponent;
+				var propKey = /*'prop_'+*/nom.toLowerCase();
+				if(component[propKey]===undefined) component[propKey] = [];
+				component[propKey][component[propKey].length] = this.getValue(nom,props[index]);
+				component['raw'] = vComponent;
 			}
-			if(ical[nameComponent+'s']!==undefined)
-				ical[nameComponent+'s'][ical[nameComponent+'s'].length]=component;
+			if(ical[nameComponent+'s'] !== undefined)
+				ical[nameComponent+'s'][ical[nameComponent+'s'].length] = component;
 		}
 	},
 	getValue: function(propName,line){
 		//console.log(line);
 		var prop={};
-		line=line.replace(/^\s+/g,'').replace(/\s+$/gi,'');
-		reg=new RegExp('('+propName+')((?:;[^=]*=[^;:\n]*)*):([^\n\r]*)','gi');
-		var matches=reg.exec(line);
+		line = line.replace(/^\s+/g,'').replace(/\s+$/gi,'');
+		reg = new RegExp('('+propName+')((?:;[^=]*=[^;:\n]*)*):([^\n\r]*)','gi');
+		var matches = reg.exec(line);
 		if(matches){ //on a trouvé la propriété cherchée
 			//console.log(propName+' ==] params='+RegExp.$2+' / valeur='+RegExp.$3);
-			var valeur=RegExp.$3;
-			var tab_params={};
+			var valeur = RegExp.$3;
+			var tab_params=[];
 			if(RegExp.$2.length>0){ //il y a des paramètres associés
-				var params=RegExp.$2.substr(1).split(';');
+				var params = RegExp.$2.substr(1).split(';');
 				var pair;
 				for(k=0;k<params.length;k++){
-					pair=params[k].split('=');
-					if(!pair[1]) pair[1]=pair[0];
+					pair = params[k].split('=');
+					if(!pair[1]) pair[1] = pair[0];
 					tab_params[pair[0]] = pair[1];
 				}
 			}
-			prop={
-				value:valeur,
-				name:propName,
-				params:tab_params
-			};
-		}else{
-			prop=null;
+			prop = { value:valeur,name:propName };
+			if(Object.keys(tab_params).length>0)
+				prop.params = tab_params;
 		}
 		return prop;
 	},
