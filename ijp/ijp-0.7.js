@@ -19,11 +19,10 @@ var icalParser = {
 	parseIcal : function(icsString){
 		var cals = icsString.match(/BEGIN:VCALENDAR\r?\n(.*\r?\n)+?END:VCALENDAR/ig);
 		for(var index in cals){
-			console.log("--->"+index+" "+cals[index]);
+			//console.log("--->"+index+" "+cals[index]);
 			var ical=new Ical(); 
 			ical.version=this.getValue('VERSION',cals[index]);
 			ical.prodid=this.getValue('PRODID',cals[index]);
-			console.log(ical);
 			cals[index]=cals[index].replace(/\r\n /g,'');
 			
 			cals[index]=cals[index].replace(/BEGIN:VCALENDAR\r?\n/ig,'');
@@ -31,28 +30,24 @@ var icalParser = {
 			matches=cals[index].match(reg);
 			if(matches){
 				for(i=0;i<matches.length;i++){
-					console.log('---------->'+matches[i]+"\n<------------");
+					//console.log('---------->'+matches[i]+"\n<------------");
 					this.parseVComponent(matches[i],ical);
 				}
 			}
 			this.icals[this.icals.length]=ical;
 		}
-		//console.log('parsed');
 	},
 	parseVComponent : function(vComponent,ical){
 		var nameComponent=vComponent.match(/BEGIN:V([^\s]+)/i)[1].toLowerCase();
 		vComponent=vComponent.replace(/\r?\n[\s]+/igm,''); //unfolding
 		vComponent=vComponent.replace(/(^begin|^end):.*/igm,'');
-		console.log(nameComponent+' ++++ '+vComponent);
+		//console.log(nameComponent+' ++++ '+vComponent);
 		var props=vComponent.match(new RegExp(this.propsList[nameComponent]+'[:;].*','gim'));
 		if(props){
-			//props.shift();//drop "begin:.*"
-			//props.pop();//drop "end:.*"
 			var component=[];
-			//console.log(props);
 			for(var index in props){
 				var nom=props[index].replace(/[:;].*$/,'');
-				console.log("--vcompo "+index+" "+nom);
+				//console.log("--vcompo "+index+" "+nom);
 				var propKey=/*'prop_'+*/nom.toLowerCase();
 				if(component[propKey]===undefined) component[propKey]=[];
 				component[propKey][component[propKey].length]=this.getValue(nom,props[index]);
@@ -66,9 +61,7 @@ var icalParser = {
 		//console.log(line);
 		var prop={};
 		line=line.replace(/^\s+/g,'').replace(/\s+$/gi,'');
-		//console.log('('+propName.replace(/;(.*)/,')(;.*')+')');
 		reg=new RegExp('('+propName+')((?:;[^=]*=[^;:\n]*)*):([^\n\r]*)','gi');
-		//console.log('regexp='+reg);
 		var matches=reg.exec(line);
 		if(matches){ //on a trouvé la propriété cherchée
 			//console.log(propName+' ==] params='+RegExp.$2+' / valeur='+RegExp.$3);
@@ -83,7 +76,6 @@ var icalParser = {
 					tab_params[pair[0]] = pair[1];
 				}
 			}
-			//console.log(tab_params);
 			prop={
 				value:valeur,
 				name:propName,
